@@ -26,8 +26,7 @@ export class AuthController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async login(
-    @Body() body: { username: string; password: string },
-    @Headers('authorization') authHeader: string
+    @Body() body: { username: string; password: string }
   ) {
     console.log('Login attempt:', body.username);
     const token = await this.authService.login(body.username, body.password);

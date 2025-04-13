@@ -9,15 +9,8 @@ export const configureSwagger = (app: INestApplication) => {
     .setDescription(envConfig.SWAGGER_DESCRIPTION || 'API with Hexagonal Architecture')
     .setVersion(envConfig.SWAGGER_VERSION || '1.0')
     .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'JWT',
-        description: 'Enter JWT token',
-        in: 'header',
-      },
-      'JWT-auth'
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      'JWT-auth', // ← Este nombre debe coincidir
     )
     .build();
 
