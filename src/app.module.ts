@@ -9,6 +9,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { InsertProducts1623456789012 } from './migrations/InsertProducts';
 import { ProductModule } from './products/product.module';
+import { PersonModule } from './person/person.module';
 // import { InsertProducts } from './migrations/InsertProducts';
 
 @Module({
@@ -32,6 +33,7 @@ import { ProductModule } from './products/product.module';
     }),
     AuthModule,
     ProductModule,
+    PersonModule
   ],
   controllers: [AppController],
   providers: [AppService,
