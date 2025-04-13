@@ -1,34 +1,18 @@
 import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
-import { AuthController } from './infrastructure/controllers/auth.controller';
-import { JwtStrategy } from './infrastructure/strategies/jwt.strategy';
-import { JwtAuthService } from './infrastructure/services/jwt.service';
-import { LoginUseCase } from './application/use-cases/login.use-case';
-import { ValidateTokenUseCase } from './application/use-cases/validate-token.use-case';
+import { AuthService } from './application/auth.service';
+import { EnvAuthAdapter } from '../adapters/env/env.auth.adapter';
+import { AuthController } from '../adapters/http/auth.controller';
+import { AUTH_PORT } from './ports/auth.port';
 
 @Module({
-  imports: [
-    PassportModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || 'secretKey',
-      signOptions: { expiresIn: '60m' },
-    }),
-  ],
-  controllers: [AuthController],
   providers: [
     {
-      provide: 'AuthPort',
-      useClass: JwtAuthService,
+      provide: AUTH_PORT,
+      useClass: EnvAuthAdapter,
     },
-    // {
-    //   provide: 'UserRepositoryPort',
-    //   useClass: UserRepositoryPort, // Implementación concreta
-    // },
-    LoginUseCase,
-    ValidateTokenUseCase,
-    JwtStrategy,
+    EnvAuthAdapter,
+    AuthService,
   ],
-  exports: ['AuthPort'],
+  controllers: [AuthController],
 })
 export class AuthModule {}
