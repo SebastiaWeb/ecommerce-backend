@@ -1,21 +1,22 @@
 // src/adapters/http/auth.controller.ts
-import { Controller, Post, Body, Headers, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, Headers, UnauthorizedException, Options, Res } from '@nestjs/common';
 import { AuthService } from '../../auth/application/auth.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiHeader } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
 import { Public } from 'src/auth/decorators/public.decorator';
+import { Response } from 'express';
 
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
-  @Post('login')
   @Public() // Decorador para marcar la ruta como pública
+  @Post('login')
   @ApiOperation({ summary: 'User login' })
   @ApiBody({ type: LoginDto })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Returns JWT token',
     headers: {
       'Authorization': {
@@ -31,7 +32,7 @@ export class AuthController {
     console.log('Login attempt:', body.username);
     const token = await this.authService.login(body.username, body.password);
     if (!token) throw new UnauthorizedException('Invalid credentials');
-    
+
     return { access_token: token };
   }
 
