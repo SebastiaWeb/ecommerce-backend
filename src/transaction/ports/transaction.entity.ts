@@ -17,6 +17,7 @@ export interface Transaction {
         cardHolder: string;
         expirationDate: string;
         cvv: string;
+        installments: number;
     };
     paymentStatus?: string;
     paymentMethodId?: string;

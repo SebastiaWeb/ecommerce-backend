@@ -19,7 +19,7 @@ export class TransactionCaseUse {
             number: transaction.paymentDetails.cardNumber || '',
             exp_month: transaction.paymentDetails.expirationDate?.split('/')[0] || '', // Asumiendo que el formato es MM/YY
             exp_year: transaction.paymentDetails.expirationDate?.split('/')[1] || '',
-            cvc: transaction.paymentDetails.cvv ,
+            cvc: transaction.paymentDetails.cvv
 
         });
 

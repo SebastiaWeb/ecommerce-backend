@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { Transaction } from "../ports/transaction.entity";
 
-export class TransactionDto {
+export class TransactionDto implements Transaction{
     @ApiProperty()
     id: string;
 
@@ -46,6 +47,7 @@ export class TransactionDto {
         cardHolder: string;
         expirationDate: string;
         cvv: string;
+        installments: number;
     };
 
     @ApiProperty({ required: false })

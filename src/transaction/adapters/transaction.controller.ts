@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nes
 import { TransactionService } from "./transaction.service";
 import { TransactionDto } from "../dto/transaction.dto";
 import { TransactionCaseUse } from "../application/transaction.case-use";
+import { Transaction } from "../ports/transaction.entity";
 
 @ApiTags("transaction")
 @Controller("transaction")
@@ -23,8 +24,8 @@ export class TransactionController {
         status: 402,
         description: 'Wompi payment failed'
     })
-    async createTransaction(@Body() transaction: TransactionDto) {
-        console.log("Transaction data:", transaction);
+    async createTransaction(@Body() transaction: Transaction) {
+        //console.log("Transaction data:", transaction);
         return this.transactionUseCase.createTransaction(transaction);
     }
 
@@ -32,7 +33,7 @@ export class TransactionController {
     @ApiOperation({ summary: 'Get transaction by ID' })
     @ApiResponse({ status: 200, description: 'Transaction found', type: TransactionDto })
     @ApiResponse({ status: 404, description: 'Transaction not found' })
-    async getTransactionById(@Param('id') id: string): Promise<TransactionDto | null> {
+    async getTransactionById(@Param('id') id: string): Promise<Transaction | null> {
         return this.transactionService.getTransactionById(id);
     }
 

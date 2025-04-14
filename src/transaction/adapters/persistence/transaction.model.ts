@@ -1,7 +1,8 @@
+import { Transaction } from "src/transaction/ports/transaction.entity";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
-export class TransactionModel {
+export class TransactionModel implements Transaction {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
@@ -47,6 +48,8 @@ export class TransactionModel {
         cardHolder: string;
         expirationDate: string;
         cvv: string;
+        installments:number;
+
     };
 
     @Column({ nullable: true })

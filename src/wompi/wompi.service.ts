@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { wompiConfig } from './wompi.config';
 import { firstValueFrom, lastValueFrom } from 'rxjs';
+import * as CryptoJS from 'crypto-js';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class WompiService {
@@ -19,14 +21,22 @@ export class WompiService {
   }
 
   async createTransaction(wompiTransactionData: any): Promise<any> {
-    const url = `${wompiConfig.baseUrl}/transactions`;
-    const response1 = this.httpService.post(url, wompiTransactionData, {
-      headers: {
-        'Authorization': `Bearer ${wompiConfig.privateKey}`,
-      },
-    });
-    const response = await lastValueFrom(response1);
-    return response.data.error.message; // Manejo de errores mejorado
+    try {
+      const url = `${wompiConfig.baseUrl}/transactions`;
+      const response1 = this.httpService.post(url, wompiTransactionData, {
+        headers: {
+          'Authorization': `Bearer ${wompiConfig.privateKey}`
+        },
+      });
+      const response = await lastValueFrom(response1);
+      return response.data.error.message; // Manejo de errores mejorado
+      
+    } catch (error) {
+      console.log("Este es el error:", JSON.stringify(error.response.data));
+      
+      console.log(error.message);
+      
+    }
   }
 
   async tokenizeCard(cardDetails: {
@@ -45,6 +55,7 @@ export class WompiService {
         exp_year: cardDetails.exp_year,
         cvc: cardDetails.cvc,
         card_holder: cardDetails.card_holder || "Test Cardholder" // Valor por defecto
+        
       };
 
       console.debug(`Tokenizing card with payload: ${JSON.stringify(payload)}`, url);
@@ -73,5 +84,46 @@ export class WompiService {
         'Failed to tokenize card'
       );
     }
+  }
+
+  async getAcceptanceToken(){
+    const url = `${wompiConfig.baseUrl}/merchants/${wompiConfig.publicKey}`;
+
+    const response = await firstValueFrom(
+      this.httpService.get(url, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+    );
+    
+    const { data } = response.data;
+
+    return data.presigned_acceptance.acceptance_token;
+
+  }
+
+  generateWompiSignature(nonce, secretKey, requestBody) {
+    // 1. Convierte el cuerpo del request a JSON sin espacios
+    const bodyString = JSON.stringify(requestBody).replace(/\s+/g, "");
+  
+    // 2. Concatena nonce + secretKey + bodyString
+    const dataToSign = nonce + secretKey + bodyString;
+  
+    // 3. Calcula el SHA256 en hexadecimal
+    const signature = CryptoJS.SHA256(dataToSign).toString(CryptoJS.enc.Hex);
+  
+    return signature;
+  }
+
+  generateWompiChecksum(transactionId, status, amountInCents, timestamp, secretId): string {
+    // 1. Concatena los campos en el orden requerido
+    const concatenatedData = `${transactionId}${status}${amountInCents}${timestamp}${secretId}`;
+
+    // 2. Genera el hash SHA-256 en mayúsculas
+    return crypto
+      .createHash('sha256')
+      .update(concatenatedData)
+      .digest('hex');
   }
 }
