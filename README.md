@@ -54,3 +54,6 @@ WOMPI_PRIVATE_KEY=
 Para levantar la base de datos PostgreSQL con Docker, ejecuta el siguiente comando:
 
 docker run --name ecommerce-db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=admin -e POSTGRES_DB=ecommerce -p 5432:5432 -d postgres
+
+# LINK AWS EC2
+ec2-13-59-117-85.us-east-2.compute.amazonaws.com
