@@ -29,13 +29,12 @@ export class WompiService {
         },
       });
       const response = await lastValueFrom(response1);
-      return response.data.error.message; // Manejo de errores mejorado
-      
+
+      return response;
+      // return response.data.error.message; // Manejo de errores mejorado
+
     } catch (error) {
-      console.log("Este es el error:", JSON.stringify(error.response.data));
-      
-      console.log(error.message);
-      
+      console.log("Este es el error:", error);
     }
   }
 
@@ -47,7 +46,7 @@ export class WompiService {
     card_holder?: string;
   }): Promise<any> {
     const url = `${wompiConfig.baseUrl}/tokens/cards`;
-    
+
     try {
       const payload = {
         number: cardDetails.number,
@@ -55,7 +54,7 @@ export class WompiService {
         exp_year: cardDetails.exp_year,
         cvc: cardDetails.cvc,
         card_holder: cardDetails.card_holder || "Test Cardholder" // Valor por defecto
-        
+
       };
 
       console.debug(`Tokenizing card with payload: ${JSON.stringify(payload)}`, url);
@@ -71,22 +70,22 @@ export class WompiService {
 
       console.log('Card tokenized successfully');
       return response.data;
-      
+
     } catch (error) {
       console.error('Failed to tokenize card', {
         error: error.response?.data || error.message,
         stack: error.stack
       });
-      
+
       throw new Error(
-        error.response?.data?.error?.message || 
-        error.response?.data?.message || 
+        error.response?.data?.error?.message ||
+        error.response?.data?.message ||
         'Failed to tokenize card'
       );
     }
   }
 
-  async getAcceptanceToken(){
+  async getAcceptanceToken() {
     const url = `${wompiConfig.baseUrl}/merchants/${wompiConfig.publicKey}`;
 
     const response = await firstValueFrom(
@@ -96,34 +95,54 @@ export class WompiService {
         },
       })
     );
-    
+
     const { data } = response.data;
 
     return data.presigned_acceptance.acceptance_token;
 
   }
 
-  generateWompiSignature(nonce, secretKey, requestBody) {
-    // 1. Convierte el cuerpo del request a JSON sin espacios
-    const bodyString = JSON.stringify(requestBody).replace(/\s+/g, "");
-  
-    // 2. Concatena nonce + secretKey + bodyString
-    const dataToSign = nonce + secretKey + bodyString;
-  
-    // 3. Calcula el SHA256 en hexadecimal
-    const signature = CryptoJS.SHA256(dataToSign).toString(CryptoJS.enc.Hex);
-  
-    return signature;
-  }
+  async generateWompiSignature(
+    reference: string,
+    amount_in_cents: number,
+    currency: string,
+    timestamp: string, // Puede ser ISO string o UNIX timestamp (segundos)
+    integritySecret: string
+  ) {
+    // 1. Validar parámetros
+    if (!reference || !amount_in_cents || !currency || !timestamp || !integritySecret) {
+      throw new Error("Todos los parámetros son requeridos");
+    }
 
-  generateWompiChecksum(transactionId, status, amountInCents, timestamp, secretId): string {
-    // 1. Concatena los campos en el orden requerido
-    const concatenatedData = `${transactionId}${status}${amountInCents}${timestamp}${secretId}`;
+    // 2. Asegurar formato correcto del monto
+    const amount = Math.round(amount_in_cents);
+    const formattedCurrency = currency.toUpperCase();
 
-    // 2. Genera el hash SHA-256 en mayúsculas
+    // 3. Convertir timestamp a formato ISO correctamente
+    let formattedTimestamp;
+    if (/^\d+$/.test(timestamp)) {
+      // Si es un timestamp UNIX (segundos)
+      formattedTimestamp = new Date(parseInt(timestamp) * 1000).toISOString();
+    } else {
+      // Si ya es una cadena ISO
+      formattedTimestamp = new Date(timestamp).toISOString();
+    }
+
+    // 4. Concatenar en el ORDEN EXACTO requerido
+    const concatenatedData = `${reference}${amount}${formattedCurrency}${integritySecret}`;
+
+    const encondedText = new TextEncoder().encode(concatenatedData);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", encondedText);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+
+    console.log("Datos concatenados CORRECTOS:", concatenatedData);
+    return hashHex;
+    // 5. Generar hash SHA-256
     return crypto
       .createHash('sha256')
       .update(concatenatedData)
-      .digest('hex');
+      .digest('hex')
+      .toLowerCase();
   }
 }

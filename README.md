@@ -24,12 +24,12 @@ Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
 
 ```env
 # Auth Basic
-AUTH_USERNAME=admin
-AUTH_PASSWORD=secret123
+AUTH_USERNAME=
+AUTH_PASSWORD=
 
 # JWT Configuration
-JWT_SECRET=mySuperSecretKey
-JWT_EXPIRES_IN=1h
+JWT_SECRET=
+JWT_EXPIRES_IN=
 
 # Swagger
 SWAGGER_TITLE=API Documentation
@@ -38,17 +38,17 @@ SWAGGER_VERSION=1.0
 SWAGGER_PATH=docs
 
 # Database Configuration
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=admin
-POSTGRES_DATABASE=ecommerce
-NODE_ENV=development
+POSTGRES_HOST=
+POSTGRES_PORT=
+POSTGRES_USER=
+POSTGRES_PASSWORD=
+POSTGRES_DATABASE=
+NODE_ENV=
 
 # Wompi Configuration
-WOMPI_BASE_URL=https://api-sandbox.co.uat.wompi.dev/v1
-WOMPI_PUBLIC_KEY=pub_stagtest_g2u0HQd3ZMh05hsSgTS2lUV8t3s4mOt7
-WOMPI_PRIVATE_KEY=prv_stagtest_5i0ZGIGiFcDQifYsXxvsny7Y37tKqFWg
+WOMPI_BASE_URL=URL
+WOMPI_PUBLIC_KEY=
+WOMPI_PRIVATE_KEY=
 
 #Configuración de la Base de Datos con Docker
 Para levantar la base de datos PostgreSQL con Docker, ejecuta el siguiente comando:

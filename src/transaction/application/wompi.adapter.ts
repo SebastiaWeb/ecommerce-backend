@@ -13,10 +13,10 @@ export class WompiAdapter {
     const wompiData = await this.mapToWompiFormat(transaction, tokenizeCard);
 
     const response = await this.wompiService.createTransaction(wompiData);
-    console.log("response:", response.data);
+    console.log("response:", response.data.data, response.status);
     
     if (response.status !== 200 || response.data.status !== 'APPROVED') {
-      throw new Error(`Wompi error: ${response.data.error || 'Unknown error'}`);
+      // throw new Error(`Wompi error: ${response.data.error || 'Unknown error'}`);
     }
 
     return response.data;
@@ -26,14 +26,16 @@ export class WompiAdapter {
     const acceptance_token = await this.wompiService.getAcceptanceToken();
     // const signature = this.wompiService.generateWompiSignature(randomUUID(), wompiConfig.privateKey, transaction);
     const amount_in_cents = transaction.amount * 100;
-    const timestampString = Math.floor(Date.now() / 1000).toString();
-    const checksum = this.wompiService.generateWompiChecksum(
-      transaction.id,
-      transaction.status,
+      // Usar el timestamp actual en formato ISO
+  const timestamp = new Date().toISOString();
+    const checksum = await this.wompiService.generateWompiSignature(
+      transaction.orderId,
       amount_in_cents,
-      timestampString,
-      wompiConfig.publicKey
+      "COP",
+      timestamp,
+      "stagtest_integrity_nAIBuqayW70XpUqJS4qf4STYiISd89Fp"
     );
+    console.log("CHECKSUM: ",checksum)
     return {
       amount_in_cents: amount_in_cents, // Asegúrate de multiplicar por 100
       currency: 'COP', // Si no se pasa la divisa, se asume COP
@@ -41,11 +43,11 @@ export class WompiAdapter {
       customer_email: transaction.email,
       payment_method: {
         type: 'CARD', // Siempre será 'CARD' si usas tarjeta
-        installments: 2,
+        installments: 1,
         token: tokenizeCard, // El token obtenido al tokenizar la tarjeta
       },
       reference: transaction.orderId,
-      acceptance_token: acceptance_token
+      acceptance_token: acceptance_token,
     };
   }
 }
