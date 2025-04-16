@@ -13,5 +13,5 @@ export const envConfig = {
     SWAGGER_TITLE: process.env.SWAGGER_TITLE || 'API Documentation',
     SWAGGER_DESCRIPTION: process.env.SWAGGER_DESCRIPTION || 'API with Hexagonal Architecture',
     SWAGGER_VERSION: process.env.SWAGGER_VERSION || '1.0',
-    SWAGGER_PATH: process.env.SWAGGER_PATH || 'docs',
+    SWAGGER_PATH: process.env.SWAGGER_PATH || 'api/docs',
 };
