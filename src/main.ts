@@ -27,6 +27,8 @@ async function bootstrap() {
     credentials: true,
     maxAge: 86400, // Cache preflight requests for 1 day
   });
+  
+  app.setGlobalPrefix('api');
 
   // Swagger configuration
   configureSwagger(app);
