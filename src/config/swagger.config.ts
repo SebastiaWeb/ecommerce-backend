@@ -12,6 +12,7 @@ export const configureSwagger = (app: INestApplication) => {
       { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
       'JWT-auth', // ← Este nombre debe coincidir
     )
+    .addServer('/api')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
