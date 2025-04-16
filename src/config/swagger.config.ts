@@ -16,7 +16,7 @@ export const configureSwagger = (app: INestApplication) => {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup(envConfig.SWAGGER_PATH || 'docs', app, document, {
+  SwaggerModule.setup(envConfig.SWAGGER_PATH || 'api/docs', app, document, {
     swaggerOptions: {
       persistAuthorization: true, // Mantiene el token entre recargas
       defaultModelExpandDepth: -1 // Oculta los schemas por defecto
